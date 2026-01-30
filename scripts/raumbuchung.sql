@@ -31,3 +31,10 @@ INSERT INTO Raum VALUES
   (200, 10, "Konferenztisch"),
   (201, 25, "Beamer");
 
+INSERT INTO Mitarbeiter VALUES
+  (1, "Max", "Mustermann", "abcdefgh", 0)
+  (3, "Hans", "Schmidt", "qwertz789", 0),
+  (4, "Laura", "Klein", "laura2024", 0),
+  (5, "Peter", "Meyer", "securePW!", 1),
+  (6, "Anna", "Schulz", "anna_pw", 0),
+  (7, "Thomas", "Becker", "admin42", 1);

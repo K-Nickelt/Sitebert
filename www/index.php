@@ -1,19 +1,52 @@
+<?php
+include "db.php";
+
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$heute = date("Y-m-d");
+$sql = "SELECT * FROM buchungen WHERE datum = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $heute);
+$stmt->execute();
+$result = $stmt->get_result();
+?>
+
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Enter a title, displayed at the top of the window.</title>
-  </head>
-  <body>
-    <h1>Enter the main heading, usually the same as the title.</h1>
-    <p>Be <b>bold</b> in stating your key points. Put them in a list: </p>
-    <ul>
-      <li>The first item in your list</li>
-      <li>The second item; <i>italicize</i> key words</li>
-    </ul>
-    <p>Improve your image by including an image. </p>
-    <p><img src="http://www.mygifs.com/CoverImage.gif" alt="A Great HTML Resource"></p>
-    <p>Add a link to your favorite <a href="https://www.dummies.com/">Web site</a>.
-    Break up your page with a horizontal rule or two. </p>
-    <hr>
-    <p>Finally, link to <a href="page2.html">another page</a> in your own Web site.</p>
-  </body>
+<head>
+    <title>Raumbelegung heute</title>
+</head>
+<body>
+
+<h2>Willkommen, <?php echo $_SESSION['user']; ?></h2>
+<a href="logout.php">Logout</a>
+
+<h3>Heutige Raumbelegung</h3>
+
+<table border="1">
+<tr>
+    <th>Raum</th>
+    <th>Von</th>
+    <th>Bis</th>
+</tr>
+
+<?php while ($row = $result->fetch_assoc()) { ?>
+<tr>
+    <td><?php echo $row['raum']; ?></td>
+    <td><?php echo $row['von']; ?></td>
+    <td><?php echo $row['bis']; ?></td>
+</tr>
+<?php } ?>
+
+</table>
+
+<br>
+<a href="buchen.php">
+    <button>Raum buchen</button>
+</a>
+
+</body>
 </html>

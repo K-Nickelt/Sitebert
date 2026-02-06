@@ -1,0 +1,276 @@
+
+## 1️⃣ Projektstruktur (empfohlen)
+
+Lege im Ordner `htdocs` (XAMPP) z.B. dieses Projekt an:
+
+```
+raumverwaltung/
+│
+├── db.php
+├── login.php
+├── login_check.php
+├── logout.php
+├── index.php
+├── buchen.php
+└── style.css   (optional)
+```
+
+---
+
+## 2️⃣ SQL-Datenbank (Grundlage)
+
+Erstelle in **phpMyAdmin** eine Datenbank, z.B. `raumverwaltung`.
+
+### Tabelle `users`
+
+```sql
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50),
+    password VARCHAR(255)
+);
+```
+
+Testuser anlegen (Passwort: `1234`):
+
+```sql
+INSERT INTO users (username, password)
+VALUES ('test', SHA2('1234', 256));
+```
+
+---
+
+### Tabelle `buchungen`
+
+```sql
+CREATE TABLE buchungen (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    raum VARCHAR(50),
+    datum DATE,
+    von TIME,
+    bis TIME
+);
+```
+
+---
+
+## 3️⃣ Datenbankverbindung (`db.php`)
+
+```php
+<?php
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "raumverwaltung";
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+if ($conn->connect_error) {
+    die("Verbindung fehlgeschlagen: " . $conn->connect_error);
+}
+session_start();
+?>
+```
+
+---
+
+## 4️⃣ Login-Seite (`login.php`)
+
+```php
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+<h2>Login</h2>
+
+<form action="login_check.php" method="post">
+    Benutzername:<br>
+    <input type="text" name="username" required><br><br>
+
+    Passwort:<br>
+    <input type="password" name="password" required><br><br>
+
+    <button type="submit">Login</button>
+</form>
+</body>
+</html>
+```
+
+---
+
+## 5️⃣ Login prüfen (`login_check.php`)
+
+```php
+<?php
+include "db.php";
+
+$username = $_POST['username'];
+$password = hash("sha256", $_POST['password']);
+
+$sql = "SELECT * FROM users WHERE username=? AND password=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ss", $username, $password);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows == 1) {
+    $_SESSION['user'] = $username;
+    header("Location: index.php");
+} else {
+    echo "Login fehlgeschlagen";
+}
+```
+
+---
+
+## 6️⃣ Startseite nach Login (`index.php`)
+
+```php
+<?php
+include "db.php";
+
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$heute = date("Y-m-d");
+$sql = "SELECT * FROM buchungen WHERE datum = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $heute);
+$stmt->execute();
+$result = $stmt->get_result();
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raumbelegung heute</title>
+</head>
+<body>
+
+<h2>Willkommen, <?php echo $_SESSION['user']; ?></h2>
+<a href="logout.php">Logout</a>
+
+<h3>Heutige Raumbelegung</h3>
+
+<table border="1">
+<tr>
+    <th>Raum</th>
+    <th>Von</th>
+    <th>Bis</th>
+</tr>
+
+<?php while ($row = $result->fetch_assoc()) { ?>
+<tr>
+    <td><?php echo $row['raum']; ?></td>
+    <td><?php echo $row['von']; ?></td>
+    <td><?php echo $row['bis']; ?></td>
+</tr>
+<?php } ?>
+
+</table>
+
+<br>
+<a href="buchen.php">
+    <button>Raum buchen</button>
+</a>
+
+</body>
+</html>
+```
+
+---
+
+## 7️⃣ Raum buchen (`buchen.php` – Grundversion)
+
+```php
+<?php
+include "db.php";
+
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $raum  = $_POST['raum'];
+    $datum = $_POST['datum'];
+    $von   = $_POST['von'];
+    $bis   = $_POST['bis'];
+
+    $sql = "INSERT INTO buchungen (raum, datum, von, bis) VALUES (?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssss", $raum, $datum, $von, $bis);
+    $stmt->execute();
+
+    echo "Raum erfolgreich gebucht!";
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raum buchen</title>
+</head>
+<body>
+
+<h2>Raum buchen</h2>
+
+<form method="post">
+    Raum:<br>
+    <input type="text" name="raum" required><br><br>
+
+    Datum:<br>
+    <input type="date" name="datum" required><br><br>
+
+    Von:<br>
+    <input type="time" name="von" required><br><br>
+
+    Bis:<br>
+    <input type="time" name="bis" required><br><br>
+
+    <button type="submit">Buchen</button>
+</form>
+
+<br>
+<a href="index.php">Zurück</a>
+
+</body>
+</html>
+```
+
+---
+
+## 8️⃣ Logout (`logout.php`)
+
+```php
+<?php
+session_start();
+session_destroy();
+header("Location: login.php");
+```
+
+---
+
+## 🔥 Was du damit schon hast
+
+✔ Login mit SQL
+✔ Session-Login
+✔ Übersicht heutiger Buchungen
+✔ Raum buchen
+✔ Lokal über XAMPP lauffähig
+
+---
+
+Wenn du willst, helfe ich dir als Nächstes bei:
+
+* ❌ Doppelbuchungen verhindern
+* 🎨 Einfaches CSS-Design
+* 👥 Mehrere Benutzer / Rollen
+* 📊 Kalenderansicht
+* 📝 Erklärung für die Präsentation
+
+Sag einfach, **was ihr für die Note braucht** 😄

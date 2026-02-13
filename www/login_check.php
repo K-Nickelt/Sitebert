@@ -1,18 +1,23 @@
 <?php
 include "db.php";
 
-$username = $_POST['username'];
-$password = hash("sha256", $_POST['password']);
+$vorname  = $_POST['vorname'];
+$nachname = $_POST['nachname'];
 
-$sql = "SELECT * FROM users WHERE username=? AND password=?";
+$sql = "SELECT * FROM Mitarbeiter WHERE Vorname=? AND Nachname=?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $username, $password);
+$stmt->bind_param("ss", $vorname, $nachname);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows == 1) {
-    $_SESSION['user'] = $username;
+    $user = $result->fetch_assoc();
+    
+    $_SESSION['mitarb_nr'] = $user['Nummer'];
+    $_SESSION['name'] = $user['Vorname'] . " " . $user['Nachname'];
+    
     header("Location: index.php");
 } else {
-    echo "Login fehlgeschlagen";
+    echo "Login fehlgeschlagen!";
 }
+?>

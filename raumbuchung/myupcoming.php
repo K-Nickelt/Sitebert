@@ -7,7 +7,7 @@ if (!isset($_SESSION['mitarb_nr'])) {
 }
 
 $heute = date("Y-m-d");
-$mitarb_nr = $_SESSION['mitarb_nr']
+$mitarb_nr = $_SESSION['mitarb_nr'];
 $sql = "
 SELECT B.Datum, B.Zeitslot, R.Nummer
 FROM Buchung B

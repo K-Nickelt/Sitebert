@@ -26,25 +26,27 @@ $result = $stmt->get_result();
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Deine kommenden Buchungen</title>
+    <title>Deine bevorstehend Buchungen</title>
 </head>
 <body>
 
 <h2>Willkommen, <?php echo $_SESSION['name']; ?></h2>
 <a href="logout.php">Logout</a>
 
-<h3>Raumbelegung heute (<?php echo $heute; ?>)</h3>
+<h3>Deine Raumbuchungen für die kommenden Tage:</h3>
 
 <table border="1">
 <tr>
-    <th>Raum</th>
+    <th>Datum</th>
     <th>Zeitslot</th>
+    <th>Raum</th>
 </tr>
 
 <?php while ($row = $result->fetch_assoc()) { ?>
 <tr>
-    <td><?php echo $row['Nummer']; ?></td>
+    <td><?php echo §row['Datum']; ?></td>
     <td><?php echo $row['Zeitslot']; ?></td>
+    <td><?php echo $row['Nummer']; ?></td>
 </tr>
 <?php } ?>
 

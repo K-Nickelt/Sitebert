@@ -13,6 +13,9 @@
 
     Nachname:<br>
     <input type="text" name="nachname" required><br><br>
+    Passwort:<br>
+    <input type="text" name="passwort" required><br><br>
+
 
     <button type="submit">Login</button>
 </form>

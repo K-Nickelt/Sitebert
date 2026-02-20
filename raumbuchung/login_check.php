@@ -3,10 +3,11 @@ include "db.php";
 
 $vorname  = $_POST['vorname'];
 $nachname = $_POST['nachname'];
+$passwort = $_POST['passwort'];
 
-$sql = "SELECT * FROM Mitarbeiter WHERE Vorname=? AND Nachname=?";
+$sql = "SELECT * FROM Mitarbeiter WHERE Vorname=? AND Nachname=? AND Passwort=?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $vorname, $nachname);
+$stmt->bind_param("sss", $vorname, $nachname, $passwort);
 $stmt->execute();
 $result = $stmt->get_result();
 

@@ -20,6 +20,6 @@ if ($result->num_rows == 1) {
     header("Location: index.php");
 } else {
     echo "Login fehlgeschlagen!";
-    echo "<a href=index.php>Zurück zum Login</a>;"
+    echo "<a href=index.php>Zurück zum Login</a>";
 }
 ?>
